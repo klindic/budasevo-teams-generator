@@ -43,6 +43,12 @@ fn main() {
             break;
         }
     }
+
+    println!("Press enter to exit application..");
+    stdout().flush().unwrap();
+
+    let mut input = String::new();
+    stdin().read_line(&mut input).expect("Wrong input!");
 }
 
 fn get_players_count() -> u8 {
