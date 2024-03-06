@@ -1,14 +1,16 @@
 mod models;
 use crate::models::player::Player;
 
+use std::fs;
 use std::io::{ stdin, stdout, Write };
 
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 
 fn main() {
-    let players_count = get_players_count();
-    let mut players = get_players(players_count);
+    let input = read_from_input();
+
+    let mut players = get_players(input);
 
     loop {
         println!("Randomizing teams..\n");
@@ -51,77 +53,24 @@ fn main() {
     stdin().read_line(&mut input).expect("Wrong input!");
 }
 
-fn get_players_count() -> u8 {
-    let count: u8;
+fn read_from_input() -> String {
+    let file_path = "src/assets/input.txt";
 
-    loop {
-        print!("How many players will attend the game (10-14): ");
-        stdout().flush().unwrap();
-
-        let mut input = String::new();
-        stdin().read_line(&mut input).expect("Wrong input!");
-
-        let players_count: u8 = match input.trim().parse() {
-            Ok(num) => num,
-            Err(_) => {
-                println!("Please enter a valid number (0-255).");
-                continue;
-            }
-        };
-
-        if players_count >= 10 && players_count <= 14 {
-            count = players_count;
-            break;
-        } else {
-            println!("Number of players should be between 10 and 14.");
-        }
-    }
-
-    return count;
+    let contents = fs::read_to_string(file_path).expect("Should have been able to read the file");
+    return contents;
 }
 
-fn get_players(count: u8) -> Vec<Player> {
-    let count = count as usize;
+fn get_players(input: String) -> Vec<Player> {
+    let players_input = input.split('\n').collect::<Vec<&str>>();
+    let players_count = players_input.len();
 
-    println!(
-        "In the next section you will need to enter player names and ability to run (1-10) in format (name,5)."
-    );
-    stdout().flush().unwrap();
+    let mut players: Vec<Player> = Vec::with_capacity(players_count);
 
-    let mut players: Vec<Player> = Vec::with_capacity(count);
-
-    for player in 0..count {
-        loop {
-            let mut input = String::new();
-
-            print!("{}.", player + 1);
-            stdout().flush().unwrap();
-            stdin().read_line(&mut input).expect("wrong input!");
-
-            // Trim the input and split it
-            let parts: Vec<&str> = input.trim().split(",").collect();
-
-            if parts.len() == 2 {
-                let name = parts[0].trim().to_string();
-                let score = parts[1].trim();
-
-                match score.parse::<i8>() {
-                    Ok(num) => {
-                        if num < 1 || num > 10 {
-                            println!("Ability to run should be between 1 and 10 (1-10).");
-                        } else {
-                            players.push(Player { name, score: num });
-                            break;
-                        }
-                    }
-                    Err(_) => {
-                        println!("The format is incorrect. Please try again. eg.: Name,5");
-                    }
-                }
-            } else {
-                println!("The format is incorrect. Please try again. eg.: Name,5");
-            }
-        }
+    for player in players_input {
+        let player_data = player.split(',').collect::<Vec<&str>>();
+        let player_name = player_data[0].to_string();
+        let player_score = player_data[1].parse().expect("Score is not a valid number");
+        players.push(Player { name: player_name, score: player_score });
     }
 
     return players;
