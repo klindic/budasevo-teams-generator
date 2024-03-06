@@ -1,0 +1,14 @@
+binja,7
+luka,7
+soka,6
+trec,6
+vlado,5
+hrco,8
+aco,5
+djoga,3
+pale,4
+james,7
+dragic,6
+skrinja,7
+franko,6
+kiki,7
